@@ -1,5 +1,7 @@
+# generation.py
+
 import os
-import requests
+from openai import OpenAI  
 
 from config import (
     HF_INFERENCE_MODEL,
@@ -10,17 +12,11 @@ from config import (
 
 
 def build_prompt(query, chunk_texts):
-    """
-    Construct a RAG-style prompt 
-    """
     sources_str_parts = []
     for i, chunk in enumerate(chunk_texts, start=1):
         sources_str_parts.append(f"[{i}] {chunk.strip()}")
-
-    # join sources with blank lines for readbility 
     sources_str = "\n\n".join(sources_str_parts)
 
-    # put everything together into instructions 
     prompt = (
         "You are a helpful assistant. You must answer using ONLY the information "
         "provided in the numbered sources below.\n\n"
@@ -44,42 +40,27 @@ def hf_generate(
     top_p=TOP_P,
 ):
     """
-    Call HuggingFace Inference API for text generation.
-    Requires HF_API_TOKEN in environment.
+    Call Hugging Face Router using the OpenAI-compatible chat API.
     """
-    api_token = os.environ.get("HF_API_TOKEN")
+    api_token = os.environ.get("HF_TOKEN") or os.environ.get("HF_API_TOKEN")
     if api_token is None:
-        raise RuntimeError("HF_API_TOKEN env var is not set.")
-    
-    # HF inference endpoint for this model
-    url = f"https://api-inference.huggingface.co/models/{model_id}"
+        raise RuntimeError("HF_TOKEN or HF_API_TOKEN env var must be set.")
 
-    headers = {
-        "Authorization": f"Bearer {api_token}",
-        "Accept": "application/json",
-    }
+    # openAI client pointing at HF Router
+    client = OpenAI(
+        base_url="https://router.huggingface.co/v1",
+        api_key=api_token,
+    )
 
-    payload = {
-        "inputs": prompt,
-        "parameters": {
-            "max_new_tokens": max_new_tokens,
-            "temperature": temperature,
-            "top_p": top_p,
-        },
-    }
+    completion = client.chat.completions.create(
+        model=model_id,
+        messages=[
+            {"role": "user", "content": prompt},
+        ],
+        max_tokens=max_new_tokens,
+        temperature=temperature,
+        top_p=top_p,
+    )
 
-    response = requests.post(url, headers=headers, json=payload, timeout=60)
-    response.raise_for_status()
-    data = response.json()
-
-    if isinstance(data, list) and data:
-        item = data[0]
-        if isinstance(item, dict) and "generated_text" in item:
-            return str(item["generated_text"])
-        return str(item)
-
-    if isinstance(data, dict) and "generated_text" in data:
-        return str(data["generated_text"])
-
-    # stringify whatever we get
-    return str(data)
+    # get the text from the first choice
+    return completion.choices[0].message.content

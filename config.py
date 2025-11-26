@@ -1,8 +1,8 @@
 # config.py
 
 BBC_DATASET_NAME = "gopalkalpande/bbc-news-summary"
-TEXT_FIELD = "Text" 
-SUMMARY_FIELD = "Summary" 
+TEXT_FIELD = "Articles" 
+SUMMARY_FIELD = "Summaries"
 
 # chunking
 SENTENCES_PER_CHUNK = 5
@@ -16,8 +16,8 @@ EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 EMBEDDING_BATCH_SIZE = 32
 TOP_K = 5
 
-# HF Inference API
-HF_INFERENCE_MODEL = "openai/gpt-oss-20b"
+# HF Inference API w/ openai client (see generation.py)
+HF_INFERENCE_MODEL = "HuggingFaceTB/SmolLM3-3B:hf-inference"
 MAX_NEW_TOKENS = 256
 TEMPERATURE = 0.2
 TOP_P = 0.95

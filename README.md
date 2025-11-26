@@ -10,7 +10,7 @@ Compares **BM25 (lexical)** vs **semantic retrieval (embeddings + FAISS)**, then
 - **Dataset:** `gopalkalpande/bbc-news-summary`
 - **Lexical retrieval:** from scratch BM25 implementation over sentence-based chunks
 - **Semantic retrieval:** `sentence-transformers/all-MiniLM-L6-v2`
-- **LLM (generation via HF Inference API):** `openai/gpt-oss-20b`  
+- **LLM (generation via HF Inference API):** `HuggingFaceTB/SmolLM3-3B:hf-inference`  
   (configured in `config.py` as `HF_INFERENCE_MODEL`)
 
 ---
