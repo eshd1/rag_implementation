@@ -38,4 +38,6 @@ Compares **BM25 (lexical)** vs **semantic retrieval (embeddings + FAISS)**, then
 - ```python -m venv rag```
 - ```pip install -r requirements.txt```
 - ```export HF_API_TOKEN="your_hf_inference_api_token```
-- Run ```python run_experiment.py``` to run the experiement 
+- Run ```python run_experiment.py``` to run the experiement
+
+**NOTE** For full transparency GPT was utilized to help format the latex write up portion and to help debug. 
